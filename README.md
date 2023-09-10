@@ -254,7 +254,13 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 - 请实现`fetch.py`中的`fetch`函数，其参数为`url`，**url严格为https://dev.qweather.com/en/help**，在处理过程中请先拉取网页链接内容，接着提取上方说明里的p标签里面的文字信息，最后得到处理好的`question`进行返回。【3分】
 - 请在`app.py`中添加网页总结功能，在接收到`/fetch url`指令时，正确调用`fetch.py`里的`fetch`函数，得到处理好的`question`后，将更新后的`messages`传递给语言模型，并使AI助手回复获取到的内容。【2分】
 
-提示：可以使用BeautifulSoup结合CSS选择器抽取元素，https://www.crummy.com/software/BeautifulSoup/bs4/doc.zh/#id42
+提示：
+
+- 可以使用BeautifulSoup结合CSS选择器抽取元素，https://www.crummy.com/software/BeautifulSoup/bs4/doc.zh/#id42
+
+- CSS选择器可以使用浏览器开发者工具中的`Copy selector`获取
+
+  ![](./figures/hint1.png)
 
 
 
