@@ -4,6 +4,7 @@ import requests
 import json
 
 def generate_text(prompt):
+    #print(prompt)
     url = "http://localhost:8080/v1/completions"
     messages = {"model": "gpt-3.5-turbo","prompt": prompt,"temperature": 0.7}
     json_msg = json.dumps(messages)
@@ -13,11 +14,11 @@ def generate_text(prompt):
     return dict['choices'][0]['text']
 
 def generate_answer(current_file_text: str, content: str):
-    prompt = f"I am reading the passage:\n{current_file_text}.According to the passage, the answer of '{content} is:'"
+    prompt = f"I am reading the passage:\n{current_file_text}.According to the passage, the answer of '{content}' is"
     return prompt
 
 def generate_summary(current_file_text: str):
-    prompt = f"I am reading the passage:\n{current_file_text}.Summarize this passage in one or two sentences:"
+    prompt = f"I am reading the passage:\n{current_file_text}\nTo summarize it in less than three sentence,"
     return prompt
 
 if __name__ == "__main__":
