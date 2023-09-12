@@ -54,7 +54,7 @@ def bot(history):# 回复
             history[-1][1] = "other command"
     else:
         history[-1][1] = "cool"
-    print(messages)
+    #print(messages)
     return history
 
 with gr.Blocks() as demo:
