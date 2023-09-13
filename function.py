@@ -3,7 +3,7 @@ import requests
 from typing import List, Dict
 import json
 import openai
-# curl -L -X GET --compressed 'https://geoapi.qweather.com/v2/city/lookup?location=beij&key=8888c47d5b624f0fa1974570dd31efc8'
+# curl -L -X GET --compressed 'https://geoapi.qweather.com/v2/city/lookup?location=Shanghai,China&key=8888c47d5b624f0fa1974570dd31efc8'
 
 todo_list = ""
 def lookup_location_id(location: str):
@@ -13,18 +13,26 @@ def lookup_location_id(location: str):
         'key': '8888c47d5b624f0fa1974570dd31efc8'
     }
     response = requests.get(url,params=params)
+    #if response.status_code != 200:
+    #    return ""
     dict = json.loads(response.text)
-    #print(dict['location'][0]['id'])
+    if dict['code']!= "200":
+        #print(dict['code'])
+        return ""
     return dict['location'][0]['id']
 
 def get_current_weather(location: str):
     id = lookup_location_id(location)
+    if id == "":
+        return f"can't find {location}."
     url = 'https://devapi.qweather.com/v7/weather/now'
     params = {
         'location': id,
         'key': '8888c47d5b624f0fa1974570dd31efc8'
     }
     response = requests.get(url,params=params)
+    if response.status_code != 200:
+        return f"can't get the weather of {location}."
     dict = json.loads(response.text)['now']
     return f"Temperature: {dict['feelsLike']} Description:{dict['text']} Humidity: {dict['humidity']}"
 
@@ -45,7 +53,7 @@ def function_calling(messages: List[Dict]):
                 "properties": {
                     "location": {
                         "type": "string",
-                        "description": "The city and state, e.g. San Francisco, CA",
+                        "description": "A city, province or counrty,or none. e.g. ShangHai, Beijing, China, US. No form of \"Shanghai, China\"",
                     },
                 },
                 "required": ["location"],
@@ -74,6 +82,8 @@ def function_calling(messages: List[Dict]):
         functions=functions,
         function_call="auto",
     )
+    if response["choices"][0]["message"]["content"] != None:
+        return "no function found!"
     func = response["choices"][0]["message"]["function_call"]
     #print(func)
     if func["function"] == "add_todo":
@@ -86,10 +96,10 @@ def function_calling(messages: List[Dict]):
         return None
 
 if __name__ == "__main__":
-    messages = [{"role": "user", "content": "What's the weather like in Beijing?"}]
+    messages = [{"role": "user", "content": "What's the weather like in"}]
     response = function_calling(messages)
     print(response)
 
-    messages = [{"role": "user", "content": "Add a todo: walk"}]
-    response = function_calling(messages)
-    print(response)
+    #messages = [{"role": "user", "content": "Add a todo: do math homework"}]
+    #response = function_calling(messages)
+    #print(response)

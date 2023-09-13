@@ -4,6 +4,7 @@ import time
 import requests
 import json
 import pdf
+import function
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 # message:[{"role": "user", "content": "Who won the world series in 2020?"},{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},{"role": "user", "content": "Where was it played?"}] 
 messages = []
@@ -24,6 +25,7 @@ def add_file(history, file):# 上传文件
 def bot(history):# 回复
     global current_file_text
     last_msg = history[-1][0]
+    response = ""
     #print(last_msg)
     if isinstance(last_msg, tuple):# 上传了一个文件
         last_msg = last_msg[0]
@@ -35,26 +37,27 @@ def bot(history):# 回复
                 current_file_text = txt.read()
                 prompt = pdf.generate_summary(current_file_text)
                 response = pdf.generate_text(prompt)
-                history[-1][1] = response
                 messages.append({"role": "user", "content": prompt})
-                messages.append({"role": "assistant", "content": response})
                 
         else:
-            history[-1][1] = "other file"
+            response = "other file"
     elif last_msg[0] == '/': # 使用命令
         cmd = last_msg.split(" ")[0] #获取命令
         content = last_msg[5:] #获取命令后面的内容
         if cmd == "/file": # 文件聊天
             prompt = pdf.generate_answer(current_file_text,content)
             response = pdf.generate_text(prompt)
-            history[-1][1] = response
             messages.append({"role": "user", "content": prompt})
-            messages.append({"role": "assistant", "content": response})
+        elif cmd == "/function":# 函数调用
+            messages.append({"role":"user","content":content})
+            response = function.function_calling(messages)
         else:
-            history[-1][1] = "other command"
+            response = "other command"
     else:
-        history[-1][1] = "cool"
+        response = "chat"
     #print(messages)
+    history[-1][1] = response
+    messages.append({"role": "assistant", "content": response})
     return history
 
 with gr.Blocks() as demo:
