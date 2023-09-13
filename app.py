@@ -39,23 +39,29 @@ def bot(history):# 回复
             with open(last_msg,"r") as txt:
                 current_file_text = txt.read()
                 prompt = pdf.generate_summary(current_file_text)
-                response = pdf.generate_text(prompt)
                 messages.append({"role": "user", "content": prompt})
-                
+                chat_generator = pdf.generate_text(prompt)
+                history[-1][1] = ""
+                for word in chat_generator:
+                    history[-1][1]=history[-1][1]+word
+                    yield history
+                messages.append({"role": "assistant", "content": history[-1][1]})     
         else:
-            response = "other file"
-        history[-1][1] = response
-        messages.append({"role": "assistant", "content": response})
-        return history
+            history[-1][1] = "other file"
+            messages.append({"role": "assistant", "content": history[-1][1]})
+            return history
     elif last_msg[0] == '/': # 使用命令
         cmd = last_msg.split(" ")[0] #获取命令
         content = last_msg[len(cmd)+1:] #获取命令后面的内容
         if cmd == "/file": # 文件聊天
             prompt = pdf.generate_answer(current_file_text,content)
-            response = pdf.generate_text(prompt)
             messages.append({"role": "user", "content": prompt})
-            history[-1][1] = response
-            messages.append({"role": "assistant", "content": response})
+            chat_generator = pdf.generate_text(prompt)
+            history[-1][1] = ""
+            for word in chat_generator:
+                history[-1][1]=history[-1][1]+word
+                yield history
+            messages.append({"role": "assistant", "content": history[-1][1]})
             return history
         elif cmd == "/function":# 函数调用
             messages.append({"role":"user","content":content})
@@ -66,8 +72,8 @@ def bot(history):# 回复
         elif cmd == "/fetch": # 网页总结
             prompt = fetch.fetch(content)
             messages.append({"role":"user","content":prompt})
-            history[-1][1]=""
             chat_generator=chat.chat(messages)
+            history[-1][1] = ""
             for word in chat_generator:
                 history[-1][1]=history[-1][1]+word
                 yield history
@@ -77,8 +83,8 @@ def bot(history):# 回复
             #print(prompt)
             messages.append({"role":"user","content":prompt})
             # print(prompt)
-            history[-1][1]=""
             chat_generator=chat.chat(messages)
+            history[-1][1] = ""
             for word in chat_generator:
                 history[-1][1]=history[-1][1]+word
                 yield history
