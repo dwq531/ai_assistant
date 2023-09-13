@@ -5,6 +5,7 @@ import requests
 import json
 import pdf
 import function
+import fetch
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 # message:[{"role": "user", "content": "Who won the world series in 2020?"},{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},{"role": "user", "content": "Where was it played?"}] 
 messages = []
@@ -51,6 +52,11 @@ def bot(history):# 回复
         elif cmd == "/function":# 函数调用
             messages.append({"role":"user","content":content})
             response = function.function_calling(messages)
+        elif cmd == "/fetch": # 网页总结
+            prompt = fetch.fetch(content)
+            messages.append({"role":"user","content":prompt})
+            #chat(messages)
+
         else:
             response = "other command"
     else:
