@@ -6,6 +6,8 @@ import json
 import pdf
 import function
 import fetch
+import chat
+import search
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 # message:[{"role": "user", "content": "Who won the world series in 2020?"},{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},{"role": "user", "content": "Where was it played?"}] 
 messages = []
@@ -42,29 +44,64 @@ def bot(history):# 回复
                 
         else:
             response = "other file"
+        history[-1][1] = response
+        messages.append({"role": "assistant", "content": response})
+        return history
     elif last_msg[0] == '/': # 使用命令
         cmd = last_msg.split(" ")[0] #获取命令
-        content = last_msg[5:] #获取命令后面的内容
+        content = last_msg[len(cmd)+1:] #获取命令后面的内容
         if cmd == "/file": # 文件聊天
             prompt = pdf.generate_answer(current_file_text,content)
             response = pdf.generate_text(prompt)
             messages.append({"role": "user", "content": prompt})
+            history[-1][1] = response
+            messages.append({"role": "assistant", "content": response})
+            return history
         elif cmd == "/function":# 函数调用
             messages.append({"role":"user","content":content})
             response = function.function_calling(messages)
+            history[-1][1] = response
+            messages.append({"role": "assistant", "content": response})
+            return history
         elif cmd == "/fetch": # 网页总结
             prompt = fetch.fetch(content)
             messages.append({"role":"user","content":prompt})
-            #chat(messages)
-
+            history[-1][1]=""
+            chat_generator=chat.chat(messages)
+            for word in chat_generator:
+                history[-1][1]=history[-1][1]+word
+                yield history
+            messages.append({"role": "assistant", "content": history[-1][1]})
+        elif cmd== "/search":#网络搜索
+            prompt = search.search(content)
+            #print(prompt)
+            messages.append({"role":"user","content":prompt})
+            # print(prompt)
+            history[-1][1]=""
+            chat_generator=chat.chat(messages)
+            for word in chat_generator:
+                history[-1][1]=history[-1][1]+word
+                yield history
+            # print(history)
+            messages.append({"role": "assistant", "content": history[-1][1]})
         else:
             response = "other command"
+            history[-1][1] = response
+            messages.append({"role": "assistant", "content": response})
+            return history
     else:
-        response = "chat"
+        #print(type(last_msg))
+        messages.append({"role":"user","content":last_msg})
+        history[-1][1]=""
+        chat_generator=chat.chat(messages)
+        for word in chat_generator:
+            history[-1][1]=history[-1][1]+word
+            yield history
+            # print(history)
+        messages.append({"role": "assistant", "content": history[-1][1]})
     #print(messages)
-    history[-1][1] = response
-    messages.append({"role": "assistant", "content": response})
-    return history
+    
+    
 
 with gr.Blocks() as demo:
     chatbot = gr.Chatbot(
