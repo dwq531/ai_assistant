@@ -91,6 +91,13 @@ def bot(history):# 回复
                 yield history
             # print(history)
             messages.append({"role": "assistant", "content": history[-1][1]})
+        elif cmd == "/image":  # 生成图片
+            messages.append({"role": "user", "content": content})
+            response = image_generate.image_generate(content)
+            messages.append({"role": "assitant", "content": response})
+            history[-1][1] = response
+            yield history
+        
         else:
             response = "other command"
             history[-1][1] = response
