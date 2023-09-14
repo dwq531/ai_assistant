@@ -7,11 +7,11 @@ def audio2text(file):
     openai.api_base="http://166.111.80.169:8080/v1"
 
     # 使用 OpenAI 的语音转文字 API
-    file = file.replace("\\", "/")
+    #file = file.replace("\\", "/")
     audio_file = open(file, "rb")
     response = openai.Audio.transcribe("whisper-1", audio_file)
     # 获取转录文本
-    transcription = response["segments"][0]["text"]
+    transcription = response["text"]
     return transcription
 
    
