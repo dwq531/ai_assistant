@@ -20,6 +20,7 @@ current_file_text = None
 
 def add_text(history, text):# 对话框
     #print(history,text)
+    #print(messages)
     history = history + [(text, None)]
     
     return history, gr.update(value="", interactive=False)
@@ -128,10 +129,10 @@ def bot(history):# 回复
             chat_audio = text2audio(content_audio)
             response_audio = (chat_audio,)
             history[-1][1]=response_audio
-            messages.append({"role": "assistant", "content":  history[-1][1]})      
+            messages.append({"role": "assistant", "content": content_audio})      
             yield history
         elif cmd == "/image":  # 生成图片
-            messages.append({"role": "user", "content": content})
+            messages.append({"role": "user", "content": last_msg})
             response = image_generate.image_generate(content)
             messages.append({"role": "assitant", "content": response})
             history[-1][1] = (response,)
