@@ -75,7 +75,7 @@ def function_calling(messages: List[Dict]):
         }
     ]
     openai.api_key="1111"
-    openai.api_base="http://localhost:8080"
+    openai.api_base="http://166.111.80.169:8080"
     response = openai.ChatCompletion.create(
         model="ggml-openllama.bin",
         messages=messages,

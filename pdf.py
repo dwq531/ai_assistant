@@ -6,7 +6,7 @@ import openai
 
 def generate_text(prompt):
     openai.api_key = "1111"
-    openai.api_base="http://localhost:8080"
+    openai.api_base="http://166.111.80.169:8080"
     
     response = openai.Completion.create(
         model="gpt-3.5-turbo",

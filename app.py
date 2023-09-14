@@ -102,7 +102,7 @@ def bot(history):# 回复
         history[-1][1]=""
         chat_generator=chat.chat(messages)
         for word in chat_generator:
-            print(history)
+            #print(history)
             history[-1][1]=history[-1][1]+word
             yield history
         messages.append({"role": "assistant", "content": history[-1][1]})
