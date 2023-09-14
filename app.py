@@ -8,6 +8,9 @@ import function
 import fetch
 import chat
 import search
+import openai
+from stt import audio2text 
+from tts import text2audio
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 # message:[{"role": "user", "content": "Who won the world series in 2020?"},{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},{"role": "user", "content": "Where was it played?"}] 
 messages = []
@@ -46,6 +49,16 @@ def bot(history):# 回复
                     history[-1][1]=history[-1][1]+word
                     yield history
                 messages.append({"role": "assistant", "content": history[-1][1]})     
+        elif extension == ".wav":#语音输入
+            content = audio2text(last_msg)
+            messages.append({"role": "user", "content": content})
+            chat_generator=chat.chat(messages)
+            #print(messages)
+            history[-1][1] = ""
+            for word in chat_generator:
+                history[-1][1]=history[-1][1]+word
+                yield history
+            messages.append({"role": "assistant", "content": history[-1][1]})
         else:
             history[-1][1] = "other file"
             messages.append({"role": "assistant", "content": history[-1][1]})
@@ -91,6 +104,22 @@ def bot(history):# 回复
                 yield history
             # print(history)
             messages.append({"role": "assistant", "content": history[-1][1]})
+        elif cmd == "/audio":#语音输出
+            messages.append({"role":"user","content":content})
+            openai.api_key = "1111"
+            openai.api_base="http://166.111.80.169:8080"
+    
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                temperature= 0.7,
+            )
+            content_audio = response["choices"][0]["message"]["content"]
+            chat_audio = text2audio(content_audio)
+            response_audio = (chat_audio,)
+            history[-1][1]=response_audio
+            messages.append({"role": "assistant", "content":  history[-1][1]})      
+            yield history
         else:
             response = "other command"
             history[-1][1] = response
