@@ -15,8 +15,8 @@ def chat(messages):
         stream=True
     )
     for word in response:
-        # print(word['choices'][0]['delta']['content'])
-        # print("*")
+        #print(word)
+        #if word["choices"][0]["index"] != 0:
         yield word['choices'][0]['delta']['content']
     #return response['choices'][0]['message']['content']
     

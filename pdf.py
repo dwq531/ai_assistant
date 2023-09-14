@@ -21,7 +21,7 @@ def generate_text(prompt):
 
 
 def generate_answer(current_file_text: str, content: str):
-    prompt = f"I am reading the passage:\n{current_file_text}.According to the passage, the answer of '{content}' is"
+    prompt = f"I am reading the passage:\n{current_file_text}.According to the passage, the answer of '{content}' is:"
     return prompt
 
 def generate_summary(current_file_text: str):

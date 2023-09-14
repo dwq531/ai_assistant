@@ -61,7 +61,7 @@ def function_calling(messages: List[Dict]):
         },
         {
             "name": "add_todo",
-            "description": "Add something on a TODO-list",
+            "description": "Add something on a TODO-list. Add a todo.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -82,9 +82,10 @@ def function_calling(messages: List[Dict]):
         functions=functions,
         function_call="auto",
     )
-    if response["choices"][0]["message"]["content"] != None:
-        return "no function found!"
+        
     func = response["choices"][0]["message"]["function_call"]
+    if "function" not in func:
+        return "no function found!"
     #print(func)
     if func["function"] == "add_todo":
         arg = json.loads(func["arguments"])
@@ -96,10 +97,10 @@ def function_calling(messages: List[Dict]):
         return None
 
 if __name__ == "__main__":
-    messages = [{"role": "user", "content": "What's the weather like in"}]
+    messages = [{"role": "user", "content": "What's the weather like in Beijing"}]
     response = function_calling(messages)
     print(response)
 
-    #messages = [{"role": "user", "content": "Add a todo: do math homework"}]
-    #response = function_calling(messages)
-    #print(response)
+    messages = [{"role": "user", "content": "Add a todo: do math homework"}]
+    response = function_calling(messages)
+    print(response)

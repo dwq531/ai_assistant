@@ -49,7 +49,7 @@ def bot(history):# 回复
         else:
             history[-1][1] = "other file"
             messages.append({"role": "assistant", "content": history[-1][1]})
-            return history
+            yield history
     elif last_msg[0] == '/': # 使用命令
         cmd = last_msg.split(" ")[0] #获取命令
         content = last_msg[len(cmd)+1:] #获取命令后面的内容
@@ -62,17 +62,18 @@ def bot(history):# 回复
                 history[-1][1]=history[-1][1]+word
                 yield history
             messages.append({"role": "assistant", "content": history[-1][1]})
-            return history
         elif cmd == "/function":# 函数调用
             messages.append({"role":"user","content":content})
             response = function.function_calling(messages)
             history[-1][1] = response
+            #print(history)
             messages.append({"role": "assistant", "content": response})
-            return history
+            yield history
         elif cmd == "/fetch": # 网页总结
             prompt = fetch.fetch(content)
             messages.append({"role":"user","content":prompt})
             chat_generator=chat.chat(messages)
+            #print(messages)
             history[-1][1] = ""
             for word in chat_generator:
                 history[-1][1]=history[-1][1]+word
@@ -94,16 +95,16 @@ def bot(history):# 回复
             response = "other command"
             history[-1][1] = response
             messages.append({"role": "assistant", "content": response})
-            return history
+            yield history
     else:
-        #print(type(last_msg))
+        #print(last_msg)
         messages.append({"role":"user","content":last_msg})
         history[-1][1]=""
         chat_generator=chat.chat(messages)
         for word in chat_generator:
+            print(history)
             history[-1][1]=history[-1][1]+word
             yield history
-            # print(history)
         messages.append({"role": "assistant", "content": history[-1][1]})
     #print(messages)
     
