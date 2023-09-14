@@ -8,12 +8,14 @@ import function
 import fetch
 import chat
 import search
+from stt import audio2text
+from tts import text2audio
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 # message:[{"role": "user", "content": "Who won the world series in 2020?"},{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},{"role": "user", "content": "Where was it played?"}] 
 messages = []
 current_file_text = None
 
-def add_text(history, text):# 对话框
+def add_text(history, text): # 对话框
     #print(history,text)
     history = history + [(text, None)]
     
@@ -46,6 +48,19 @@ def bot(history):# 回复
                     history[-1][1]=history[-1][1]+word
                     yield history
                 messages.append({"role": "assistant", "content": history[-1][1]})     
+        elif extension == ".wav":#语音输入
+            #print(last_msg)
+            #print("---------------------------------------")
+            content = audio2text(last_msg)
+            messages.append({"role": "user", "content": content})
+            chat_generator=chat.chat(messages)
+            # #print(messages)
+            history[-1][1] = ""
+            for word in chat_generator:
+                history[-1][1]=history[-1][1]+word
+                yield history
+            messages.append({"role": "assistant", "content": history[-1][1]})
+
         else:
             history[-1][1] = "other file"
             messages.append({"role": "assistant", "content": history[-1][1]})
@@ -90,6 +105,12 @@ def bot(history):# 回复
                 history[-1][1]=history[-1][1]+word
                 yield history
             # print(history)
+            messages.append({"role": "assistant", "content": history[-1][1]})
+        elif cmd == "/audio":#语音输出
+            messages.append({"role":"user","content":last_msg})
+            chat_generator=chat.chat(messages)
+            response = text2audio(chat_generator)
+            history[-1][1] = response
             messages.append({"role": "assistant", "content": history[-1][1]})
         else:
             response = "other command"
