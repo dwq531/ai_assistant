@@ -8,6 +8,8 @@ import function
 import fetch
 import chat
 import search
+import image_generate
+import mnist
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 # message:[{"role": "user", "content": "Who won the world series in 2020?"},{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},{"role": "user", "content": "Where was it played?"}] 
 messages = []
@@ -46,6 +48,14 @@ def bot(history):# 回复
                     history[-1][1]=history[-1][1]+word
                     yield history
                 messages.append({"role": "assistant", "content": history[-1][1]})     
+        elif extension == ".png":  # 图片分类
+            with open(last_msg, "r") as txt:
+                file_name = txt.read()
+                messages.append({"role": "user", "content": f"Please classify {file_name}"})
+                response = mnist.image_classification(file_name)
+                history[1][-1] = response
+                yield history
+                messages.append({"role": "assistant", "content": history[-1][1]})
         else:
             history[-1][1] = "other file"
             messages.append({"role": "assistant", "content": history[-1][1]})
@@ -91,6 +101,13 @@ def bot(history):# 回复
                 yield history
             # print(history)
             messages.append({"role": "assistant", "content": history[-1][1]})
+        elif cmd == "/image":  # 生成图片
+            messages.append({"role": "user", "content": content})
+            response = image_generate.image_generate(content)
+            messages.append({"role": "assitant", "content": response})
+            history[-1][1] = response
+            yield history
+        
         else:
             response = "other command"
             history[-1][1] = response
