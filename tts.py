@@ -9,7 +9,7 @@ def text2audio(content: str):
     data = {"model": "en-us-blizzard_lessac-medium.onnx", "input": content}
     data_json = json.dumps(data)
     # 获取已有的音频文件数量
-    audio_folder = ".\\audio"
+    audio_folder = "."
     existing_audio_files = [f for f in os.listdir(audio_folder) if f.startswith("response") and f.endswith(".wav")]
     audio_count = len(existing_audio_files)
 

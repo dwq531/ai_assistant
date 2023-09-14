@@ -82,19 +82,18 @@ def function_calling(messages: List[Dict]):
         functions=functions,
         function_call="auto",
     )
-        
-    func = response["choices"][0]["message"]["function_call"]
-    if "function" not in func:
-        return "no function found!"
-    #print(func)
-    if func["function"] == "add_todo":
-        arg = json.loads(func["arguments"])
-        return add_todo(arg["todo"])
-    elif func["function"] == "get_current_weather":
-        arg = json.loads(func["arguments"])
-        return get_current_weather(arg["location"])
-    else:
-        return None
+    try:   
+        func = response["choices"][0]["message"]["function_call"]
+        if func["function"] == "add_todo":
+            arg = json.loads(func["arguments"])
+            return add_todo(arg["todo"])
+        elif func["function"] == "get_current_weather":
+            arg = json.loads(func["arguments"])
+            return get_current_weather(arg["location"])
+        else:
+            return None
+    except:
+        return f"no function found!response:{response}"
 
 if __name__ == "__main__":
     messages = [{"role": "user", "content": "What's the weather like in Beijing"}]

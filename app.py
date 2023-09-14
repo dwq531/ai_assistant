@@ -62,13 +62,13 @@ def bot(history):# 回复
                 yield history
             messages.append({"role": "assistant", "content": history[-1][1]})
         elif extension == ".png":  # 图片分类
-            with open(last_msg, "r") as txt:
-                file_name = txt.read()
-                messages.append({"role": "user", "content": f"Please classify {file_name}"})
-                response = mnist.image_classification(file_name)
-                history[1][-1] = response
-                yield history
-                messages.append({"role": "assistant", "content": history[-1][1]})
+            #with open(last_msg, "r") as txt:
+            #file_name = txt.read()
+            messages.append({"role": "user", "content": f"Please classify {last_msg}"})
+            response = mnist.image_classification(last_msg)
+            history[-1][1] = response
+            yield history
+            messages.append({"role": "assistant", "content": history[-1][1]})
         else:
             history[-1][1] = "other file"
             messages.append({"role": "assistant", "content": history[-1][1]})
@@ -134,7 +134,7 @@ def bot(history):# 回复
             messages.append({"role": "user", "content": content})
             response = image_generate.image_generate(content)
             messages.append({"role": "assitant", "content": response})
-            history[-1][1] = response
+            history[-1][1] = (response,)
             yield history
         
         else:
